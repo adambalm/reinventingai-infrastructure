@@ -27,23 +27,32 @@ Setup instructions for new team members accessing ReinventingAI infrastructure.
    - Set up backup directories
    - Show you next steps
 
-3. **Configure Environment Variables**
+3. **Generate Encryption Key**
+   Create a secure encryption key for n8n:
+   ```bash
+   openssl rand -hex 32
+   ```
+   Copy the 64-character result (you'll need it in the next step).
+
+4. **Configure Environment Variables**
    Open the .env file in your text editor:
    ```bash
    vim .env
    ```
    Or use any text editor you prefer (nano, code, etc.)
    
-   **REQUIRED:** Update these values (ask Ed for the actual values):
-   - `N8N_ENCRYPTION_KEY` - Secret key for encrypting n8n data
+   **REQUIRED:** Update these values:
+   - `N8N_ENCRYPTION_KEY` - Paste the 64-character key you generated above
    - `N8N_HOST` - Should be https://r2d2.reinventingai.com
    - `WEBHOOK_URL` - Should be https://r2d2.reinventingai.com/webhook
+   
+   **Important:** Never share or commit this encryption key. Generate a unique key for each environment.
    
    Save and close the file when done.
 
 ## Service Management
 
-4. **Start n8n Service**
+5. **Start n8n Service**
    Navigate to the n8n directory and start the service:
    ```bash
    cd docker/n8n
@@ -51,7 +60,7 @@ Setup instructions for new team members accessing ReinventingAI infrastructure.
    ```
    The `-d` flag runs it in the background (detached mode).
 
-5. **Verify Service is Running**
+6. **Verify Service is Running**
    Check that the container started successfully:
    ```bash
    docker ps
@@ -64,11 +73,19 @@ Setup instructions for new team members accessing ReinventingAI infrastructure.
    ```
    Press Ctrl+C to stop viewing logs.
 
-6. **Access n8n Web Interface**
+7. **Access n8n Web Interface**
    Open your web browser and go to: https://r2d2.reinventingai.com
    You should see the n8n login/setup page.
 
-7. **Create Initial Backup**
+8. **Test Your Setup**
+   Return to the repository root and run the test suite:
+   ```bash
+   cd ../..
+   ./scripts/test-documentation.sh
+   ```
+   This verifies that all procedures work correctly.
+
+9. **Create Initial Backup**
    From the repository root directory:
    ```bash
    ./scripts/daily-backup.sh

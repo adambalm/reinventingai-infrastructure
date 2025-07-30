@@ -7,6 +7,8 @@ services:
     image: n8nio/n8n:${N8N_IMAGE_VERSION:-1.103.2}
     container_name: ${N8N_CONTAINER_NAME:-n8n-gabe}
     restart: unless-stopped
+    env_file:
+      - ../../.env
     ports:
       - "${N8N_EXTERNAL_PORT:-5679}:${N8N_INTERNAL_PORT:-5678}"
     environment:

@@ -81,17 +81,29 @@ If the whole computer crashes or gets destroyed:
 
 **Practice recovering every month** - Don't wait for a real emergency to find out if your backups work.
 
-**How to test:**
+**Automated Testing:**
+Run the documentation test suite to verify all procedures work:
+```bash
+./scripts/test-documentation.sh
+```
+
+**Manual Recovery Testing:**
 1. Set up a test environment (separate from production)
-2. Try restoring from a backup
+2. Try restoring from a backup using: `cd docker/n8n && ./restore.sh backup-filename.tar.gz`
 3. Make sure all your workflows work correctly
 4. Time how long the recovery takes
 5. Document any problems you encounter
 
 **Check your backups regularly:**
 - Run `./scripts/daily-backup.sh` to create fresh backups
-- Verify backup files exist and aren't corrupted
+- Verify backup files exist: `ls -la ~/backups/n8n/`
+- Test backup integrity with restore process
 - Keep backups for at least 30 days
+
+**Verify your environment configuration:**
+- Make sure .env file has proper encryption key: `grep N8N_ENCRYPTION_KEY .env`
+- Test tunnel connectivity: `./tunnels/scripts/tunnel-health.sh r2d2.reinventingai.com`
+- Verify service health: `docker ps | grep n8n-gabe`
 
 ## Emergency Contacts
 

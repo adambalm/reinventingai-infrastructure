@@ -13,6 +13,8 @@ This directory contains everything needed to run n8n (workflow automation) in Do
 
 **If this is your first time here, follow the main setup guide first:** `docs/team-onboarding.md`
 
+**Important:** The .env file must be configured in the repository root with a real encryption key before starting the service.
+
 ### Check if n8n is Running
 ```bash
 docker ps
@@ -105,10 +107,15 @@ You'll see the n8n interface where you can create and manage workflows.
 **Service won't start:**
 1. Check Docker is running: `docker ps`
 2. Check the logs: `docker logs n8n-gabe`
-3. Verify environment variables in `.env` file
-4. Make sure port 5678 isn't already in use
+3. Verify environment variables in repository root `.env` file (not in this directory)
+4. Make sure encryption key is set: `grep N8N_ENCRYPTION_KEY ../../.env`
+5. Make sure port 5678 isn't already in use
 
 **Can't access the web interface:**
 1. Verify service is running: `docker ps`
 2. Check if you can reach: https://r2d2.reinventingai.com
 3. Look at service logs for errors: `docker logs n8n-gabe`
+4. Test tunnel health: `../../tunnels/scripts/tunnel-health.sh r2d2.reinventingai.com`
+
+**Environment variable warnings:**
+If you see warnings about N8N_ENCRYPTION_KEY not being set, the .env file in the repository root needs to be configured with real values. The Docker Compose file references `../../.env` from this directory.

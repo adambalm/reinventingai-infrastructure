@@ -9,8 +9,10 @@ Infrastructure repository for Docker services, tunnel management, and automation
 **Quick setup:**
 1. Clone repository: `git clone https://github.com/adambalm/reinventingai-infrastructure.git`
 2. Run setup script: `./scripts/setup-environment.sh`
-3. Configure environment variables in `.env` file
-4. Start services: `cd docker/n8n && docker-compose up -d`
+3. Generate encryption key: `openssl rand -hex 32`
+4. Configure environment variables in `.env` file with real values
+5. Start services: `cd docker/n8n && docker-compose up -d`
+6. Verify setup: `./scripts/test-documentation.sh`
 
 ## Repository Structure
 
@@ -43,10 +45,30 @@ Technical documentation and operational procedures.
 
 Critical Docker volumes contain persistent application data. Always backup before infrastructure changes.
 
+## Testing and Validation
+
+**Test all documentation and procedures:**
+```bash
+./scripts/test-documentation.sh
+```
+
+This validates:
+- Environment setup scripts work correctly
+- Backup and restore procedures function properly
+- Service health checks pass
+- All documented commands execute successfully
+
+**Run tests before:**
+- Making infrastructure changes
+- Releasing updates
+- Onboarding new team members
+
 ## Team Access
 
 Repository provides shared infrastructure management for team collaboration. See `docs/team-onboarding.md` for setup instructions.
 
+All documentation is written for high school computer science student comprehension level while maintaining professionalism.
+
 ## Support
 
-For infrastructure issues, refer to service-specific documentation in respective directories.
+For infrastructure issues, refer to service-specific documentation in respective directories. Use the testing framework to verify procedures work correctly before reporting issues.
