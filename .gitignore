@@ -1,35 +1,75 @@
 # Environment files
 .env
+.env.*
+!.env.example
 .env.local
-.env.*.local
+.env.production
+.env.development
+.env.staging
 
 # Backup files
 *.tar.gz
 *.backup
 *.bak
+backups/
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Editor files
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
 # Logs
 *.log
 logs/
+npm-debug.log*
 
 # Temporary files
 *.tmp
 temp/
 tmp/
+.cache/
 
 # Sensitive data
 secrets/
 credentials/
+private/
 *.key
 *.pem
 *.crt
+*.p12
+*.pfx
+*.jks
+id_rsa*
+*.ppk
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker secrets
+docker-compose.override.yml
+.docker/
+
+# Node modules (if any JS tooling is added)
+node_modules/
+
+# Python (if any Python tooling is added)
+__pycache__/
+*.pyc
+*.pyo
+
+# Test artifacts
+coverage/
+.nyc_output/
+
+# Security scan results
+*.sarif
+security-report.*
