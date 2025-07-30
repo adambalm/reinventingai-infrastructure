@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  n8n-gabe:
+    image: n8nio/n8n:1.103.2
+    container_name: n8n-gabe
+    restart: unless-stopped
+    ports:
+      - "5679:5678"
+    environment:
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_PUBLIC_API_SWAGGERUI_DISABLED=true
+      - N8N_PORT=5678
+      - N8N_PUBLIC_API_DISABLED=true
+      - GENERIC_TIMEZONE=America/New_York
+      - N8N_ENCRYPTION_KEY=fcadc85741894b03bf90011e4b1f032498c520c591f2387b0989dcb4fec4c712
+      - N8N_HOST=r2d2.reinventingai.com
+      - WEBHOOK_URL=https://r2d2.reinventingai.com/
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+    volumes:
+      - n8n_data_gabe:/home/node/.n8n
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  n8n_data_gabe:
+    external: true
