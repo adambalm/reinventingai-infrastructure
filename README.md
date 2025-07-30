@@ -4,10 +4,13 @@ Infrastructure repository for Docker services, tunnel management, and automation
 
 ## Quick Start
 
-1. Clone repository
-2. Configure environment: `cp .env.example .env`
-3. Set required environment variables in `.env`
-4. Navigate to service directory for specific setup instructions
+**New team members:** See `docs/team-onboarding.md` for complete setup instructions.
+
+**Quick setup:**
+1. Clone repository: `git clone https://github.com/adambalm/reinventingai-infrastructure.git`
+2. Run setup script: `./scripts/setup-environment.sh`
+3. Configure environment variables in `.env` file
+4. Start services: `cd docker/n8n && docker-compose up -d`
 
 ## Repository Structure
 
