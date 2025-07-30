@@ -1,69 +1,68 @@
 # ReinventingAI Infrastructure
 
-This repository contains all infrastructure code, scripts, and documentation for the ReinventingAI collaboration between Ed and Gabe.
+Infrastructure as code repository containing Docker configurations, automation scripts, and deployment tools.
 
-## Quick Start
+## Setup
 
 1. Clone this repository
-2. Check the specific service you need in the appropriate directory
-3. Follow the README in that directory
+2. Configure environment variables: `cp .env.example .env`
+3. Edit `.env` with your actual values (see .env.example for required variables)
+4. Navigate to the specific service directory
+5. Follow the service-specific README
 
 ## Repository Structure
 
-### `/docker`
-Container configurations and management scripts for our services:
-- **n8n**: Workflow automation platform (r2d2.reinventingai.com)
-- **gohighlevel**: Coming soon
+### docker/
+Container configurations and orchestration files.
+- `n8n/`: Workflow automation platform deployment
+- `gohighlevel/`: Not yet implemented
 
-### `/tunnels`
-Cloudflare tunnel configurations and management:
-- Setup guides
-- Tunnel configurations
-- Health check scripts
+### tunnels/
+Cloudflare tunnel configurations and management scripts.
+- Setup and configuration files
+- Health monitoring scripts
 
-### `/mcp`
-Model Context Protocol configurations and integrations (future)
+### mcp/
+Model Context Protocol configurations and integrations.
 
-### `/automations`
-Client automation templates and configurations
+### automations/
+Client-specific automation templates and configurations.
 
-### `/scripts`
-Utility scripts for common operations
+### scripts/
+Shared utility scripts for common operations.
 
-### `/docs`
-General documentation and best practices
+### docs/
+Technical documentation and operational procedures.
 
-## Critical Information
+## Data Volumes
 
-### Data Volumes
-**NEVER DELETE THESE VOLUMES** - They contain all persistent data:
-- `n8n_data_gabe` - Gabe's n8n test environment data
+WARNING: The following Docker volumes contain all persistent application data. Data loss will occur if these volumes are deleted.
 
-### Backup Policy
-Daily backups are automated. Manual backup before any major changes:
+- Volume name configured via `N8N_VOLUME_NAME` environment variable (default: n8n_data_gabe)
+
+## Backup Operations
+
+Manual backup before infrastructure changes:
 ```bash
 ./scripts/daily-backup.sh
 ```
 
-### Active Services
+Automated daily backups are configured for production environments.
+
+## Service Configuration
 
 | Service | URL | Container | Port | Volume |
 |---------|-----|-----------|------|--------|
-| n8n (test) | https://r2d2.reinventingai.com | n8n-gabe | 5679 | n8n_data_gabe |
-| n8n (prod) | https://n8n.reinventingai.com | TBD | TBD | TBD |
+| n8n (test) | See .env N8N_HOST | See .env N8N_CONTAINER_NAME | See .env N8N_EXTERNAL_PORT | See .env N8N_VOLUME_NAME |
+| n8n (prod) | Not yet implemented | Not yet implemented | Not yet implemented | Not yet implemented |
 
-## Emergency Contacts
+## Development Guidelines
 
-- Ed: [contact]
-- Gabe: [contact]
-
-## Contributing
-
-1. Always test changes in test environment first
-2. Document any infrastructure changes
-3. Update relevant READMEs
-4. Commit with clear messages
+1. Test all changes in test environment before production deployment
+2. Document infrastructure modifications in relevant README files
+3. Update environment variable documentation when adding new configuration
+4. Use clear, descriptive commit messages
 
 ## License
 
-Private repository - ReinventingAI internal use only
+Private repository for internal use.

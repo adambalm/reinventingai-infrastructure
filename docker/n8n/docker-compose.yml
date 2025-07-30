@@ -1,25 +1,27 @@
-version: '3.8'
+# Load environment variables from repository root
+# Run from: /docker/n8n directory
+# Env file at: ../../.env
 
 services:
   n8n-gabe:
-    image: n8nio/n8n:1.103.2
-    container_name: n8n-gabe
+    image: n8nio/n8n:${N8N_IMAGE_VERSION:-1.103.2}
+    container_name: ${N8N_CONTAINER_NAME:-n8n-gabe}
     restart: unless-stopped
     ports:
-      - "5679:5678"
+      - "${N8N_EXTERNAL_PORT:-5679}:${N8N_INTERNAL_PORT:-5678}"
     environment:
-      - N8N_RUNNERS_ENABLED=true
-      - N8N_DIAGNOSTICS_ENABLED=false
-      - N8N_PUBLIC_API_SWAGGERUI_DISABLED=true
-      - N8N_PORT=5678
-      - N8N_PUBLIC_API_DISABLED=true
-      - GENERIC_TIMEZONE=America/New_York
-      - N8N_ENCRYPTION_KEY=fcadc85741894b03bf90011e4b1f032498c520c591f2387b0989dcb4fec4c712
-      - N8N_HOST=r2d2.reinventingai.com
-      - WEBHOOK_URL=https://r2d2.reinventingai.com/
-      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
-      - N8N_PROTOCOL=https
-      - NODE_ENV=production
+      - N8N_RUNNERS_ENABLED=${N8N_RUNNERS_ENABLED:-true}
+      - N8N_DIAGNOSTICS_ENABLED=${N8N_DIAGNOSTICS_ENABLED:-false}
+      - N8N_PUBLIC_API_SWAGGERUI_DISABLED=${N8N_PUBLIC_API_SWAGGERUI_DISABLED:-true}
+      - N8N_PORT=${N8N_INTERNAL_PORT:-5678}
+      - N8N_PUBLIC_API_DISABLED=${N8N_PUBLIC_API_DISABLED:-true}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-America/New_York}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_HOST=${N8N_HOST}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=${N8N_VERSION_NOTIFICATIONS_ENABLED:-false}
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-https}
+      - NODE_ENV=${NODE_ENV:-production}
     volumes:
       - n8n_data_gabe:/home/node/.n8n
     healthcheck:
@@ -31,4 +33,5 @@ services:
 
 volumes:
   n8n_data_gabe:
+    name: ${N8N_VOLUME_NAME:-n8n_data_gabe}
     external: true

@@ -13,6 +13,15 @@ This is an infrastructure repository for ReinventingAI's Docker services, tunnel
 - **scripts/**: Shared utility scripts
 - **docs/**: Documentation and best practices
 
+## Environment Setup
+
+**CRITICAL: Configure environment variables before any operations:**
+```bash
+# Copy example file and configure with your values
+cp .env.example .env
+vim .env  # Set N8N_ENCRYPTION_KEY, N8N_HOST, WEBHOOK_URL
+```
+
 ## Common Commands
 
 ### n8n Service Management
@@ -21,8 +30,9 @@ The primary service is n8n (workflow automation) running in containers.
 **Check service status:**
 ```bash
 cd docker/n8n
-docker ps | grep n8n-gabe
-docker logs n8n-gabe --tail 50
+# Service names are configured via environment variables
+docker ps | grep ${N8N_CONTAINER_NAME:-n8n-gabe}
+docker logs ${N8N_CONTAINER_NAME:-n8n-gabe} --tail 50
 ```
 
 **Backup n8n data (CRITICAL - always backup before changes):**
@@ -69,13 +79,13 @@ docker-compose up -d
 ## Critical Data Volumes
 
 **NEVER DELETE THESE DOCKER VOLUMES** - They contain all persistent data:
-- `n8n_data_gabe` - Contains all n8n workflows, credentials, and configuration data
+- Volume name configured via `N8N_VOLUME_NAME` (default: n8n_data_gabe) - Contains all n8n workflows, credentials, and configuration data
 
 ## Active Services
 
 | Service | URL | Container | Port | Volume |
 |---------|-----|-----------|------|--------|
-| n8n (test) | https://r2d2.reinventingai.com | n8n-gabe | 5679 | n8n_data_gabe |
+| n8n (test) | ${N8N_HOST} | ${N8N_CONTAINER_NAME} | ${N8N_EXTERNAL_PORT} | ${N8N_VOLUME_NAME} |
 
 ## Development Workflow
 
@@ -92,4 +102,4 @@ The n8n service uses specific environment variables for OAuth and webhook functi
 - WEBHOOK_URL configured for external integrations
 - Encryption keys are environment-specific
 
-OAuth callbacks are configured to: `https://r2d2.reinventingai.com/rest/oauth2-credential/callback`
+OAuth callbacks are configured to: `https://${N8N_HOST}/rest/oauth2-credential/callback`

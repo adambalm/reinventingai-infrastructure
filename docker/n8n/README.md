@@ -1,106 +1,101 @@
-# n8n Docker Setup
+# n8n Docker Configuration
 
-This directory contains all configurations and scripts for managing n8n instances.
+Docker Compose configuration and management scripts for n8n workflow automation platform.
 
-## Current Instances
+## Environment Configuration
 
-### Test Environment (r2d2)
-- **URL**: https://r2d2.reinventingai.com
-- **Container**: n8n-gabe
-- **Port**: 5679
-- **Volume**: n8n_data_gabe
-- **Purpose**: Safe testing environment for Gabe
+### Test Environment
+- URL: Configured via `N8N_HOST` environment variable
+- Container: Configured via `N8N_CONTAINER_NAME` (default: n8n-gabe)
+- Port: Configured via `N8N_EXTERNAL_PORT` (default: 5679)
+- Volume: Configured via `N8N_VOLUME_NAME` (default: n8n_data_gabe)
 
-## Quick Commands
+## Operations
 
-### Check Status
+### Service Status
 ```bash
-docker ps | grep n8n-gabe
-docker logs n8n-gabe --tail 50
+docker ps | grep ${N8N_CONTAINER_NAME:-n8n-gabe}
+docker logs ${N8N_CONTAINER_NAME:-n8n-gabe} --tail 50
 ```
 
-### Backup Data
+### Data Management
 ```bash
+# Create backup
 ./backup.sh
-```
 
-### Restore Data
-```bash
+# Restore from backup
 ./restore.sh backup-filename.tar.gz
-```
 
-### Test Persistence
-```bash
+# Test data persistence
 ./test-persistence.sh
 ```
 
-## Initial Setup
+## Deployment
 
-### 1. Create Container with Persistent Volume
-
+### Prerequisites
+Configure environment variables before deployment:
 ```bash
-docker run -d \
-  --name n8n-gabe \
-  -p 5679:5678 \
-  -v n8n_data_gabe:/home/node/.n8n \
-  -e N8N_RUNNERS_ENABLED=true \
-  -e N8N_DIAGNOSTICS_ENABLED=false \
-  -e N8N_PUBLIC_API_SWAGGERUI_DISABLED=true \
-  -e N8N_PORT=5678 \
-  -e N8N_PUBLIC_API_DISABLED=true \
-  -e GENERIC_TIMEZONE=America/New_York \
-  -e N8N_ENCRYPTION_KEY=fcadc85741894b03bf90011e4b1f032498c520c591f2387b0989dcb4fec4c712 \
-  -e N8N_HOST=r2d2.reinventingai.com \
-  -e WEBHOOK_URL=https://r2d2.reinventingai.com/ \
-  -e N8N_VERSION_NOTIFICATIONS_ENABLED=false \
-  -e N8N_PROTOCOL=https \
-  -e NODE_ENV=production \
-  n8nio/n8n:1.103.2
+# Copy example environment file
+cp ../../.env.example ../../.env
+
+# Required variables:
+# - N8N_ENCRYPTION_KEY (generate with: openssl rand -hex 32)
+# - N8N_HOST (your domain)
+# - WEBHOOK_URL (https://your-domain/)
+vim ../../.env
 ```
 
-### 2. Verify Persistence
-Always test persistence before starting work:
+### Service Startup
 ```bash
+# Deploy n8n service
+docker-compose up -d
+
+# Verify data persistence
 ./test-persistence.sh
 ```
 
-### 3. Set Up Owner Account
-Only after persistence is verified, access https://r2d2.reinventingai.com and create the owner account.
+### Initial Account Setup
+After verifying persistence, access the configured N8N_HOST domain to create the owner account.
 
-## OAuth Configuration
+## OAuth Integration
 
-For OAuth to work properly:
-1. Ensure N8N_HOST matches the actual domain
-2. Configure OAuth callbacks to: `https://r2d2.reinventingai.com/rest/oauth2-credential/callback`
-3. Test with a simple Google Sheets connection first
+OAuth callbacks must be configured to: `https://${N8N_HOST}/rest/oauth2-credential/callback`
 
-## Maintenance
+Requirements:
+1. N8N_HOST must match the actual domain
+2. SSL certificate must be valid
+3. Test with Google Sheets integration first
 
-### Container Updates
+## Container Maintenance
+
+### Image Updates
 ```bash
-# 1. Backup current data
+# 1. Create data backup
 ./backup.sh
 
-# 2. Stop and remove container (data is safe in volume)
-docker stop n8n-gabe
-docker rm n8n-gabe
+# 2. Stop and remove container
+docker stop ${N8N_CONTAINER_NAME:-n8n-gabe}
+docker rm ${N8N_CONTAINER_NAME:-n8n-gabe}
 
-# 3. Pull new image
+# 3. Pull updated image
 docker pull n8nio/n8n:latest
 
-# 4. Recreate container with same volume
-# Use the docker run command above with updated image tag
+# 4. Update N8N_IMAGE_VERSION in .env and restart
+docker-compose up -d
 
-# 5. Verify data persisted
-docker exec n8n-gabe ls -la /home/node/.n8n/
+# 5. Verify data integrity
+docker exec ${N8N_CONTAINER_NAME:-n8n-gabe} ls -la /home/node/.n8n/
 ```
 
-### Troubleshooting
-See [troubleshooting.md](troubleshooting.md) for common issues and solutions.
+## Data Volume Warnings
 
-## ⚠️ CRITICAL WARNINGS
+CRITICAL: Data loss will occur if the following operations are performed:
 
-1. **NEVER** run `docker volume rm n8n_data_gabe`
-2. **ALWAYS** backup before major changes
-3. **ALWAYS** test persistence after container recreation
-4. **NEVER** create containers without volume mounts
+1. `docker volume rm ${N8N_VOLUME_NAME}` - Permanently deletes all workflows and credentials
+2. Container deployment without volume mounts - Creates ephemeral storage
+3. Volume name changes without data migration - Orphans existing data
+
+Required procedures:
+- Create backup before any infrastructure changes
+- Verify data persistence after container recreation
+- Test volume mounts before production deployment
