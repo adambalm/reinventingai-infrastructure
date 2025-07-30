@@ -1,56 +1,57 @@
-# R2D2 Cloudflare Tunnel Setup
+# R2D2 Tunnel Configuration
 
-Configuration documentation for r2d2.reinventingai.com tunnel.
+How the r2d2.reinventingai.com domain connects to our n8n service.
 
-## Overview
+## What This Does
 
-The r2d2.reinventingai.com domain routes through Cloudflare tunnels to provide secure access to internal services without exposing ports directly.
+The r2d2.reinventingai.com domain uses Cloudflare tunnels to securely connect to our n8n service without exposing any ports directly to the internet.
 
-## Current Configuration
-
-**Domain:** r2d2.reinventingai.com  
-**Target Service:** n8n (port 5678)  
-**Protocol:** HTTPS with SSL termination at Cloudflare
-
-## DNS Configuration
-
-Cloudflare DNS should have a CNAME record pointing r2d2.reinventingai.com to the tunnel endpoint.
-
-## Service Routing
-
+Think of it like this:
 ```
-r2d2.reinventingai.com → Cloudflare Tunnel → localhost:5678 (n8n)
+Your browser → Cloudflare → Secure tunnel → n8n service (port 5678)
 ```
 
-## SSL Configuration
+## Current Setup
 
-SSL certificates are managed by Cloudflare. The tunnel provides end-to-end encryption from client to Cloudflare edge.
+- **Website URL:** r2d2.reinventingai.com
+- **What it connects to:** n8n service running on port 5678
+- **Security:** HTTPS with SSL certificates managed by Cloudflare
 
-## Health Monitoring
+## How It Works
 
-Use the tunnel health check script to verify connectivity:
+1. You type r2d2.reinventingai.com in your browser
+2. Cloudflare receives your request
+3. Cloudflare securely forwards it through a tunnel to our server
+4. Our n8n service receives the request and responds
+5. The response goes back through the tunnel to your browser
+
+## Testing the Connection
+
+You can test if the tunnel is working properly:
 
 ```bash
 ./tunnels/scripts/tunnel-health.sh r2d2.reinventingai.com
 ```
 
+This script checks:
+- DNS is working (domain name resolves to an IP address)
+- HTTPS connection works
+- SSL certificate is valid
+
 ## Troubleshooting
 
-**Connection Issues:**
-1. Verify tunnel daemon is running
-2. Check DNS propagation
-3. Validate SSL certificate status
-4. Confirm service is running on target port
+**Can't access r2d2.reinventingai.com:**
+1. Check if the n8n service is running: `docker ps`
+2. Test the tunnel: `./tunnels/scripts/tunnel-health.sh r2d2.reinventingai.com`
+3. Look at n8n logs: `docker logs n8n-gabe`
 
-**Performance Issues:**
-1. Check tunnel latency
-2. Monitor service response times
-3. Review Cloudflare analytics
+**Website loads slowly:**
+1. Check if the n8n service is responding quickly
+2. Look at Cloudflare analytics for performance data
 
-## Maintenance
+## Maintenance Notes
 
-**Tunnel Updates:**
-Cloudflare tunnel client updates automatically. Monitor tunnel logs for any connectivity issues after updates.
-
-**DNS Changes:**  
-DNS modifications require coordination with domain administrator. Test changes in staging environment first.
+- Cloudflare automatically updates the tunnel software
+- SSL certificates renew automatically through Cloudflare
+- DNS changes need to be coordinated with whoever manages the domain
+- Always test changes in a development environment first

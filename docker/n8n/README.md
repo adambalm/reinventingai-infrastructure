@@ -1,101 +1,114 @@
-# n8n Docker Configuration
+# n8n Service Management
 
-Docker Compose configuration and management scripts for n8n workflow automation platform.
+This directory contains everything needed to run n8n (workflow automation) in Docker.
 
-## Environment Configuration
+## What's Here
 
-### Test Environment
-- URL: Configured via `N8N_HOST` environment variable
-- Container: Configured via `N8N_CONTAINER_NAME` (default: n8n-gabe)
-- Port: Configured via `N8N_EXTERNAL_PORT` (default: 5679)
-- Volume: Configured via `N8N_VOLUME_NAME` (default: n8n_data_gabe)
+- `docker-compose.yml` - Main service configuration
+- `backup.sh` - Creates backups of all n8n data
+- `restore.sh` - Restores data from a backup file
+- `test-persistence.sh` - Verifies your data survives container restarts
 
-## Operations
+## Quick Start
 
-### Service Status
+**If this is your first time here, follow the main setup guide first:** `docs/team-onboarding.md`
+
+### Check if n8n is Running
 ```bash
-docker ps | grep ${N8N_CONTAINER_NAME:-n8n-gabe}
-docker logs ${N8N_CONTAINER_NAME:-n8n-gabe} --tail 50
+docker ps
+```
+Look for a container named `n8n-gabe` in the list.
+
+### View Service Logs
+```bash
+docker logs n8n-gabe --tail 50
+```
+This shows the last 50 log messages. Press Ctrl+C to exit.
+
+### Start the Service
+```bash
+docker-compose up -d
+```
+The `-d` flag runs it in the background.
+
+### Stop the Service
+```bash
+docker-compose down
 ```
 
-### Data Management
-```bash
-# Create backup
-./backup.sh
+## Data Backup and Restore
 
-# Restore from backup
+**Always backup before making changes to the service.**
+
+### Create a Backup
+```bash
+./backup.sh
+```
+This creates a backup file with the current date and time in the filename.
+
+### Restore from Backup
+```bash
 ./restore.sh backup-filename.tar.gz
+```
+Replace `backup-filename.tar.gz` with the actual backup file name.
 
-# Test data persistence
+### Test Data Persistence
+```bash
 ./test-persistence.sh
 ```
+This script verifies that your workflows and settings survive container restarts.
 
-## Deployment
+## Accessing n8n Web Interface
 
-### Prerequisites
-Configure environment variables before deployment:
-```bash
-# Copy example environment file
-cp ../../.env.example ../../.env
+Once the service is running, open your web browser and go to:
+https://r2d2.reinventingai.com
 
-# Required variables:
-# - N8N_ENCRYPTION_KEY (generate with: openssl rand -hex 32)
-# - N8N_HOST (your domain)
-# - WEBHOOK_URL (https://your-domain/)
-vim ../../.env
-```
+You'll see the n8n interface where you can create and manage workflows.
 
-### Service Startup
-```bash
-# Deploy n8n service
-docker-compose up -d
+## Updating n8n
 
-# Verify data persistence
-./test-persistence.sh
-```
+**Always create a backup first before updating.**
 
-### Initial Account Setup
-After verifying persistence, access the configured N8N_HOST domain to create the owner account.
+1. **Create backup:**
+   ```bash
+   ./backup.sh
+   ```
 
-## OAuth Integration
+2. **Stop current service:**
+   ```bash
+   docker-compose down
+   ```
 
-OAuth callbacks must be configured to: `https://${N8N_HOST}/rest/oauth2-credential/callback`
+3. **Get latest version:**
+   ```bash
+   docker pull n8nio/n8n:latest
+   ```
 
-Requirements:
-1. N8N_HOST must match the actual domain
-2. SSL certificate must be valid
-3. Test with Google Sheets integration first
+4. **Start updated service:**
+   ```bash
+   docker-compose up -d
+   ```
 
-## Container Maintenance
+5. **Verify everything works:**
+   ```bash
+   ./test-persistence.sh
+   ```
 
-### Image Updates
-```bash
-# 1. Create data backup
-./backup.sh
+## Important Warnings
 
-# 2. Stop and remove container
-docker stop ${N8N_CONTAINER_NAME:-n8n-gabe}
-docker rm ${N8N_CONTAINER_NAME:-n8n-gabe}
+**Never delete the Docker volume `n8n_data_gabe`** - This contains all your workflows, credentials, and settings. If you delete it, everything is permanently lost.
 
-# 3. Pull updated image
-docker pull n8nio/n8n:latest
+**Always backup before making changes** - Use `./backup.sh` before updating, restarting, or making any changes to the service.
 
-# 4. Update N8N_IMAGE_VERSION in .env and restart
-docker-compose up -d
+## Troubleshooting
 
-# 5. Verify data integrity
-docker exec ${N8N_CONTAINER_NAME:-n8n-gabe} ls -la /home/node/.n8n/
-```
+**Service won't start:**
+1. Check Docker is running: `docker ps`
+2. Check the logs: `docker logs n8n-gabe`
+3. Verify environment variables in `.env` file
+4. Make sure port 5678 isn't already in use
 
-## Data Volume Warnings
-
-CRITICAL: Data loss will occur if the following operations are performed:
-
-1. `docker volume rm ${N8N_VOLUME_NAME}` - Permanently deletes all workflows and credentials
-2. Container deployment without volume mounts - Creates ephemeral storage
-3. Volume name changes without data migration - Orphans existing data
-
-Required procedures:
-- Create backup before any infrastructure changes
-- Verify data persistence after container recreation
-- Test volume mounts before production deployment
+**Can't access the web interface:**
+1. Verify service is running: `docker ps`
+2. Check if you can reach: https://r2d2.reinventingai.com
+3. Look at service logs for errors: `docker logs n8n-gabe`

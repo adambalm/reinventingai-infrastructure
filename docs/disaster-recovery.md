@@ -1,88 +1,111 @@
-# Disaster Recovery Procedures
+# Emergency Recovery Guide
 
-Emergency procedures for infrastructure recovery and data restoration.
+What to do if something goes wrong with our infrastructure.
 
-## Critical Data Locations
+## What Could Go Wrong
 
-**Docker Volumes**
-- n8n_data_gabe: Contains all n8n workflows, credentials, and configuration
+The main things that could break:
+1. **Complete service failure** - n8n stops working entirely
+2. **Data corruption** - Your workflows or settings get corrupted
+3. **Server/computer failure** - The whole machine crashes or dies
 
-**Backup Locations**
-- Local: $HOME/backups/n8n/
-- Service-specific backup scripts in docker/n8n/
+## Where Our Important Data Lives
 
-## Recovery Scenarios
+**Critical Data:** All n8n workflows, credentials, and settings are stored in a Docker volume called `n8n_data_gabe`
 
-### Complete Service Loss
+**Backups:** We store backup copies in:
+- Your home directory: `$HOME/backups/n8n/`
+- The backup scripts are in: `docker/n8n/`
 
-1. **Verify Backup Availability**
-   ```bash
-   ls -la $HOME/backups/n8n/
-   ```
+## Recovery Steps
 
-2. **Restore Infrastructure**
-   ```bash
-   git clone <repository-url>
-   cd reinventingai-infrastructure
-   ./scripts/setup-environment.sh
-   ```
+### Scenario 1: n8n Service Completely Stops Working
 
-3. **Restore Service Data**
-   ```bash
-   cd docker/n8n
-   ./restore.sh <backup-file>
-   ```
+**Step 1: Check if you have backups**
+```bash
+ls -la $HOME/backups/n8n/
+```
+You should see backup files with dates in their names.
 
-4. **Verify Service Recovery**
-   ```bash
-   docker-compose up -d
-   ./test-persistence.sh
-   ```
+**Step 2: Get a fresh copy of this repository**
+```bash
+git clone https://github.com/adambalm/reinventingai-infrastructure.git
+cd reinventingai-infrastructure
+./scripts/setup-environment.sh
+```
 
-### Data Corruption
+**Step 3: Restore your data from backup**
+```bash
+cd docker/n8n
+./restore.sh <backup-filename.tar.gz>
+```
+Replace `<backup-filename.tar.gz>` with the actual name of your most recent backup.
 
-1. **Stop Affected Service**
-   ```bash
-   docker-compose down
-   ```
+**Step 4: Start the service and test**
+```bash
+docker-compose up -d
+./test-persistence.sh
+```
 
-2. **Restore from Recent Backup**
-   ```bash
-   ./restore.sh <latest-backup>
-   ```
+### Scenario 2: Data Gets Corrupted
 
-3. **Restart and Verify**
-   ```bash
-   docker-compose up -d
-   ```
+If your workflows are acting weird or settings are wrong:
 
-### Infrastructure Host Loss
+**Step 1: Stop the service**
+```bash
+cd docker/n8n
+docker-compose down
+```
 
-1. **Provision New Host**
-2. **Install Prerequisites** (Docker, Docker Compose)
-3. **Clone Repository and Restore Data**
-4. **Reconfigure Network/DNS** if required
+**Step 2: Restore from your most recent backup**
+```bash
+./restore.sh <latest-backup-filename.tar.gz>
+```
 
-## Recovery Testing
+**Step 3: Restart and check**
+```bash
+docker-compose up -d
+```
+Then check https://r2d2.reinventingai.com to see if your workflows are back.
 
-**Monthly Recovery Drills**
-- Test backup restoration in isolated environment
-- Verify data integrity after restoration
-- Document recovery time and issues
+### Scenario 3: Entire Server/Computer Dies
 
-**Backup Verification**
-- Automated backup integrity checks
-- Regular test restores
-- Backup retention policy enforcement
+If the whole computer crashes or gets destroyed:
+
+1. **Get a new computer/server** with Docker installed
+2. **Clone this repository** and set it up (follow the team onboarding guide)
+3. **Restore from backup** (if you have backups stored elsewhere)
+4. **Update DNS settings** if needed (coordinate with whoever manages the domain)
+
+## Testing Your Recovery Plan
+
+**Practice recovering every month** - Don't wait for a real emergency to find out if your backups work.
+
+**How to test:**
+1. Set up a test environment (separate from production)
+2. Try restoring from a backup
+3. Make sure all your workflows work correctly
+4. Time how long the recovery takes
+5. Document any problems you encounter
+
+**Check your backups regularly:**
+- Run `./scripts/daily-backup.sh` to create fresh backups
+- Verify backup files exist and aren't corrupted
+- Keep backups for at least 30 days
 
 ## Emergency Contacts
 
-Document team member contact information for infrastructure emergencies.
+Write down contact information for:
+- Team members who know how to fix infrastructure problems
+- Domain/DNS administrator (if different from team)
+- Anyone else who needs to know about outages
 
-## Post-Recovery Actions
+## After You Fix Everything
 
-1. Analyze root cause of failure
-2. Update recovery procedures if needed
-3. Verify all services are functional
-4. Communicate status to stakeholders
-5. Schedule post-mortem review
+Once you've recovered from an emergency:
+
+1. **Figure out what went wrong** - Look at logs, investigate the root cause
+2. **Update this guide** if you learned anything new during recovery
+3. **Test everything** - Make sure all services work correctly
+4. **Tell people** - Communicate with anyone affected by the outage
+5. **Schedule a review** - Meet as a team to discuss what happened and how to prevent it
