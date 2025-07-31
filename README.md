@@ -47,6 +47,8 @@ Technical documentation and operational procedures.
 
 Critical Docker volumes contain persistent application data. Always backup before infrastructure changes.
 
+**Backup Strategy:** Repository contains backup scripts and procedures. Actual backup files are stored locally (not in version control) for security - they contain sensitive operational data, API keys, and production configurations.
+
 ## Testing and Validation
 
 **Test all documentation and procedures:**

@@ -55,12 +55,20 @@ MCP servers act as intelligent middleware to optimize task distribution, solve a
 
 ```
 mcp/
-├── README.md                 # This overview
-├── MCP_STRATEGY.md          # Complete strategic plan
+├── README.md                        # This overview and quick start
+├── MCP_STRATEGY.md                  # Complete strategic plan and roadmap
 ├── setup/
-│   ├── repository-mcp.md    # Phase 1 implementation guide
-│   └── configs/             # MCP server configurations
-└── servers/                 # MCP server implementations (future)
+│   ├── gemini-cli-usage-guide.md    # Gemini CLI MCP comprehensive usage guide
+│   ├── repository-usage-guide.md    # Repository MCP comprehensive usage guide  
+│   ├── repository-mcp.md           # Technical implementation guide
+│   └── configs/                     # MCP server configurations
+└── servers/
+    └── repository-server/           # Repository MCP server implementation
+        ├── README.md               # Server-specific documentation
+        ├── repository-mcp-server.js # Main server implementation
+        ├── package.json            # Dependencies and scripts
+        ├── docker-compose.yml      # Container deployment
+        └── logs/                   # Runtime logs and monitoring
 ```
 
 ## Quick Start
@@ -80,23 +88,29 @@ mcp/
 
 ### Usage
 
-**Repository Analysis:**
+**Quick Reference:**
 ```bash
-# Via Repository MCP (for authenticated access)
-Use Claude Code with repository-analysis MCP for private repo access
-```
-
-**Cost-Effective Analysis:**
-```bash
-# Via Gemini CLI MCP (for simple tasks)
-Use Claude Code with gemini-cli MCP for file analysis: @filename
-```
-
-**Configuration Check:**
-```bash
+# Check both MCP servers are connected
 claude mcp list
-# Should show both servers as "✓ Connected"
+# Should show:
+# gemini-cli: npx -y gemini-mcp-tool - ✓ Connected  
+# repository-analysis: node mcp/servers/repository-server/repository-mcp-server.js - ✓ Connected
 ```
+
+**Repository Analysis (Authenticated):**
+```
+Use Repository MCP to analyze https://github.com/your-org/private-repo and explain the architecture
+```
+
+**Cost-Effective File Analysis:**
+```  
+Use Gemini CLI MCP: @src/main.js @README.md explain how this project works
+```
+
+**📖 Complete Usage Guides:**
+- **[Gemini CLI MCP Usage Guide](setup/gemini-cli-usage-guide.md)** - Cost-effective analysis, file processing
+- **[Repository MCP Usage Guide](setup/repository-usage-guide.md)** - Authenticated repository access
+- **[Implementation Guide](setup/repository-mcp.md)** - Technical implementation details
 
 ## Development Guidelines
 
