@@ -42,6 +42,21 @@ if [ ! -f "$BACKUP_FILE" ]; then
     exit 1
 fi
 
+# Verify backup integrity if checksum exists
+CHECKSUM_FILE="${BACKUP_FILE}.sha256"
+if [ -f "$CHECKSUM_FILE" ]; then
+    echo "🔍 Verifying backup integrity..."
+    if sha256sum -c "$CHECKSUM_FILE" >/dev/null 2>&1; then
+        echo -e "${GREEN}✓ Backup integrity verified${NC}"
+    else
+        echo -e "${RED}✗ Backup integrity check FAILED${NC}"
+        echo "The backup file may be corrupted. Restore aborted."
+        exit 1
+    fi
+else
+    echo -e "${YELLOW}⚠ No checksum file found - skipping integrity check${NC}"
+fi
+
 echo "Starting n8n restore process..."
 echo "Backup file: ${BACKUP_FILE}"
 

@@ -41,6 +41,10 @@ cd "$REPO_ROOT"
 run_test "Setup Environment Script" \
     "bash -c './scripts/setup-environment.sh < /dev/null || true'"
 
+# Test 1b: Environment validation
+run_test "Environment Validation" \
+    "./scripts/setup-environment.sh --validate"
+
 # Test 2: Daily backup script
 run_test "Daily Backup Script" \
     "./scripts/daily-backup.sh n8n"

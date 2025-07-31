@@ -46,6 +46,42 @@ setup_env_file() {
     fi
 }
 
+# Validate required environment variables
+validate_env_vars() {
+    echo "Validating environment configuration..."
+    
+    if [[ ! -f "$REPO_ROOT/.env" ]]; then
+        echo "Error: .env file not found"
+        return 1
+    fi
+    
+    # Load environment variables
+    set -o allexport
+    source "$REPO_ROOT/.env"
+    set +o allexport
+    
+    # Check required variables
+    local missing_vars=()
+    for key in N8N_ENCRYPTION_KEY N8N_HOST WEBHOOK_URL; do
+        if [[ -z "${!key}" || "${!key}" == *"your_"*"_here"* ]]; then
+            missing_vars+=("$key")
+        fi
+    done
+    
+    if [[ ${#missing_vars[@]} -gt 0 ]]; then
+        echo "Error: The following required environment variables are not properly configured:"
+        for var in "${missing_vars[@]}"; do
+            echo "  - $var"
+        done
+        echo ""
+        echo "Please edit $REPO_ROOT/.env and set actual values for these variables."
+        echo "See docs/team-onboarding.md for detailed setup instructions."
+        return 1
+    fi
+    
+    echo "Environment validation passed"
+}
+
 # Create backup directories
 setup_backup_dirs() {
     echo "Creating backup directories..."
@@ -65,19 +101,34 @@ show_next_steps() {
     echo "1. Edit .env file with your actual values:"
     echo "   vim $REPO_ROOT/.env"
     echo ""
-    echo "2. Start n8n service:"
+    echo "2. Validate your configuration:"
+    echo "   $REPO_ROOT/scripts/setup-environment.sh --validate"
+    echo ""
+    echo "3. Start n8n service:"
     echo "   cd $REPO_ROOT/docker/n8n"
     echo "   docker-compose up -d"
     echo ""
-    echo "3. View service logs:"
+    echo "4. View service logs:"
     echo "   docker logs n8n-gabe -f"
     echo ""
-    echo "4. Create initial backup:"
+    echo "5. Create initial backup:"
     echo "   $REPO_ROOT/scripts/daily-backup.sh"
 }
 
 main() {
     cd "$REPO_ROOT"
+    
+    # Handle command line arguments
+    if [[ "${1:-}" == "--validate" ]]; then
+        validate_env_vars
+        if [[ $? -eq 0 ]]; then
+            echo "✅ Environment is properly configured and ready for use"
+        else
+            echo "❌ Environment configuration needs attention"
+            exit 1
+        fi
+        return
+    fi
     
     check_prerequisites
     setup_env_file

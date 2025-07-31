@@ -50,9 +50,16 @@ Setup instructions for new team members accessing ReinventingAI infrastructure.
    
    Save and close the file when done.
 
+5. **Validate Your Configuration**
+   Check that your environment variables are properly set:
+   ```bash
+   ./scripts/setup-environment.sh --validate
+   ```
+   This will verify all required variables are configured with real values (not placeholders).
+
 ## Service Management
 
-5. **Start n8n Service**
+6. **Start n8n Service**
    Navigate to the n8n directory and start the service:
    ```bash
    cd docker/n8n
@@ -60,7 +67,7 @@ Setup instructions for new team members accessing ReinventingAI infrastructure.
    ```
    The `-d` flag runs it in the background (detached mode).
 
-6. **Verify Service is Running**
+7. **Verify Service is Running**
    Check that the container started successfully:
    ```bash
    docker ps
@@ -73,11 +80,11 @@ Setup instructions for new team members accessing ReinventingAI infrastructure.
    ```
    Press Ctrl+C to stop viewing logs.
 
-7. **Access n8n Web Interface**
+8. **Access n8n Web Interface**
    Open your web browser and go to: https://r2d2.reinventingai.com
    You should see the n8n login/setup page.
 
-8. **Test Your Setup**
+9. **Test Your Setup**
    Return to the repository root and run the test suite:
    ```bash
    cd ../..
@@ -85,7 +92,7 @@ Setup instructions for new team members accessing ReinventingAI infrastructure.
    ```
    This verifies that all procedures work correctly.
 
-9. **Create Initial Backup**
+10. **Create Initial Backup**
    From the repository root directory:
    ```bash
    ./scripts/daily-backup.sh

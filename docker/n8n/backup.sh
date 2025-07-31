@@ -48,9 +48,14 @@ docker run --rm \
 # Verify backup was created
 if [ -f "${BACKUP_DIR}/${BACKUP_FILE}" ]; then
     SIZE=$(ls -lh "${BACKUP_DIR}/${BACKUP_FILE}" | awk '{print $5}')
+    
+    # Generate SHA256 checksum for integrity verification
+    sha256sum "${BACKUP_DIR}/${BACKUP_FILE}" > "${BACKUP_DIR}/${BACKUP_FILE}.sha256"
+    
     echo -e "${GREEN}Backup completed successfully${NC}"
     echo "Location: ${BACKUP_DIR}/${BACKUP_FILE}"
     echo "Size: ${SIZE}"
+    echo "Checksum: ${BACKUP_DIR}/${BACKUP_FILE}.sha256"
     
     # List recent backups
     echo -e "\nRecent backups:"
@@ -59,6 +64,7 @@ if [ -f "${BACKUP_DIR}/${BACKUP_FILE}" ]; then
     # Cleanup old backups (keep last 7 days)
     echo -e "\nCleaning up old backups..."
     find "${BACKUP_DIR}" -name "n8n-gabe-backup-*.tar.gz" -mtime +7 -delete
+    find "${BACKUP_DIR}" -name "n8n-gabe-backup-*.tar.gz.sha256" -mtime +7 -delete
     echo "Old backups cleaned up (kept last 7 days)"
 else
     echo -e "${RED}Error: Backup file was not created${NC}"
