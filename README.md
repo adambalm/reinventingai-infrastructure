@@ -11,7 +11,7 @@ Infrastructure repository for Docker services, tunnel management, and automation
 2. Run setup script: `./scripts/setup-environment.sh`
 3. Generate encryption key: `openssl rand -hex 32`
 4. Configure environment variables in `.env` file with real values
-5. Start services: `cd docker/n8n && docker-compose up -d`
+5. Start all services: `docker-compose up -d`
 6. Verify setup: `./scripts/test-documentation.sh`
 
 ## Repository Structure
@@ -36,10 +36,12 @@ Technical documentation and operational procedures.
 
 ## Services
 
-| Service | Environment | Status |
-|---------|-------------|--------|
-| n8n | r2d2.reinventingai.com | Active |
-| GoHighLevel | TBD | Planned |
+| Service | Environment | Status | Purpose |
+|---------|-------------|--------|---------|
+| n8n | r2d2.reinventingai.com | Active | Workflow automation |
+| Repository MCP | stdio/Docker | Active | Repository access for AI tools |
+| Gemini CLI MCP | stdio | Active | Cost-effective AI task routing |
+| GoHighLevel | TBD | Planned | CRM integration |
 
 ## Data Protection
 
@@ -67,7 +69,7 @@ This validates:
 
 Repository provides shared infrastructure management for team collaboration. See `docs/team-onboarding.md` for setup instructions.
 
-All documentation is written for high school computer science student comprehension level while maintaining professionalism.
+All documentation prioritizes clarity and accessibility while maintaining professionalism.
 
 ## Support
 

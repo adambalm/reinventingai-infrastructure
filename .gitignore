@@ -74,3 +74,6 @@ coverage/
 # Security scan results
 *.sarif
 security-report.*
+
+# Local collections (not for version control)
+ANALOGIES_AND_QUOTATIONS.md

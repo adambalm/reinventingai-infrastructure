@@ -1,0 +1,74 @@
+# ReinventingAI Infrastructure
+# Complete Docker Compose setup for all services
+# Run from repository root with: docker-compose up -d
+
+services:
+  # n8n Workflow Automation
+  n8n:
+    image: n8nio/n8n:${N8N_IMAGE_VERSION:-1.103.2}
+    container_name: ${N8N_CONTAINER_NAME:-n8n-gabe}
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${N8N_EXTERNAL_PORT:-5678}:5678"
+    environment:
+      - N8N_RUNNERS_ENABLED=${N8N_RUNNERS_ENABLED:-true}
+      - N8N_DIAGNOSTICS_ENABLED=${N8N_DIAGNOSTICS_ENABLED:-false}
+      - N8N_PUBLIC_API_SWAGGERUI_DISABLED=${N8N_PUBLIC_API_SWAGGERUI_DISABLED:-true}
+      - N8N_PORT=5678
+      - N8N_PUBLIC_API_DISABLED=${N8N_PUBLIC_API_DISABLED:-true}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-America/New_York}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_HOST=${N8N_HOST}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=${N8N_VERSION_NOTIFICATIONS_ENABLED:-false}
+      - N8N_PROTOCOL=${N8N_PROTOCOL:-https}
+      - NODE_ENV=${NODE_ENV:-production}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - infrastructure
+
+  # Repository MCP Server
+  repository-mcp:
+    build: ./mcp/servers/repository-server
+    container_name: repository-mcp-server
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${MCP_SERVER_PORT:-3001}:3001"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - MCP_SERVER_PORT=3001
+      - NODE_ENV=${NODE_ENV:-production}
+    volumes:
+      - ./mcp/servers/repository-server/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "const http = require('http'); const options = { hostname: 'localhost', port: 3001, path: '/health', timeout: 5000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - infrastructure
+    depends_on:
+      - n8n
+
+volumes:
+  n8n_data:
+    name: ${N8N_VOLUME_NAME:-n8n_data_gabe}
+    external: true
+
+networks:
+  infrastructure:
+    driver: bridge
+    name: reinventingai-infrastructure
