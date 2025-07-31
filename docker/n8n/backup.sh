@@ -49,8 +49,8 @@ docker run --rm \
 if [ -f "${BACKUP_DIR}/${BACKUP_FILE}" ]; then
     SIZE=$(ls -lh "${BACKUP_DIR}/${BACKUP_FILE}" | awk '{print $5}')
     
-    # Generate SHA256 checksum for integrity verification
-    sha256sum "${BACKUP_DIR}/${BACKUP_FILE}" > "${BACKUP_DIR}/${BACKUP_FILE}.sha256"
+    # Generate SHA256 checksum for integrity verification (macOS compatible)
+    shasum -a 256 "${BACKUP_DIR}/${BACKUP_FILE}" > "${BACKUP_DIR}/${BACKUP_FILE}.sha256"
     
     echo -e "${GREEN}Backup completed successfully${NC}"
     echo "Location: ${BACKUP_DIR}/${BACKUP_FILE}"
