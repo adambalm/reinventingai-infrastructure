@@ -65,7 +65,7 @@ services:
 
 volumes:
   n8n_data:
-    name: ${N8N_VOLUME_NAME:-n8n_data_gabe}
+    name: n8n_data_gabe_fresh
     external: true
 
 networks:
